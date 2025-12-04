@@ -6,7 +6,7 @@ from flask_limiter.util import get_remote_address
 import os
 import re
 import markdown
-from app.database import init_db, get_db
+from app.database import init_db, get_db, close_db
 from app.auth import User
 from app.security import (
     validate_username, validate_password, validate_title, validate_content,
@@ -24,15 +24,31 @@ app = Flask(__name__)
 # SECRET_KEY deve ser definida como variável de ambiente em produção
 secret_key = os.environ.get('SECRET_KEY')
 if not secret_key:
-    # Gerar uma chave aleatória se não estiver definida (apenas para desenvolvimento)
-    secret_key = secrets.token_hex(32)
+    # Em desenvolvimento, usar uma chave fixa ou carregar de arquivo para manter sessões
+    secret_key_file = 'data/.secret_key'
+    if os.path.exists(secret_key_file):
+        with open(secret_key_file, 'r') as f:
+            secret_key = f.read().strip()
+    else:
+        # Gerar uma chave e salvar para reutilizar
+        secret_key = secrets.token_hex(32)
+        os.makedirs('data', exist_ok=True)
+        with open(secret_key_file, 'w') as f:
+            f.write(secret_key)
+    
     if os.environ.get('FLASK_ENV') == 'production':
         raise ValueError("SECRET_KEY environment variable must be set in production!")
 
 app.secret_key = secret_key
 app.permanent_session_lifetime = timedelta(days=7)  # Sessão dura 7 dias
 
+# Configuração de cookies de sessão
+app.config['SESSION_COOKIE_SECURE'] = os.environ.get('FLASK_ENV') == 'production'  # HTTPS apenas em produção
+app.config['SESSION_COOKIE_HTTPONLY'] = True  # Prevenir acesso via JavaScript
+app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'  # Proteção CSRF básica
+
 # Configurar CSRF Protection
+# CSRF só protege métodos POST, PUT, DELETE, PATCH por padrão (GET é automaticamente excluído)
 csrf = CSRFProtect(app)
 
 # Configurar Rate Limiting
@@ -47,19 +63,37 @@ limiter = Limiter(
 login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'login'
-login_manager.session_protection = 'strong'  # Proteção adicional para a sessão
+# Mudar para 'basic' para evitar problemas com mudanças de IP/user-agent em desenvolvimento
+# Em produção, considere usar 'strong' se necessário
+login_manager.session_protection = 'basic'  # Proteção básica da sessão
 
 @login_manager.user_loader
 def load_user(user_id):
-    return User.get(user_id)
+    """Carrega o usuário da sessão"""
+    try:
+        user = User.get(user_id)
+        # Verificar se o usuário existe e está ativo
+        if user and user.is_active:
+            return user
+    except Exception as e:
+        # Log error in production
+        print(f"Error in load_user: {e}")
+    return None
 
 # Initialize database
 with app.app_context():
     init_db()
 
+# Registrar teardown para fechar conexões do banco de dados
+app.teardown_appcontext(close_db)
+
 @app.before_request
 def make_session_permanent():
-    session.permanent = True  # Torna a sessão permanente
+    # Torna a sessão permanente apenas se o usuário estiver autenticado
+    if current_user.is_authenticated:
+        session.permanent = True
+        # Garantir que o cookie de sessão seja salvo
+        session.modified = True
 
 @app.after_request
 def set_security_headers(response: Response) -> Response:

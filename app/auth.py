@@ -33,12 +33,16 @@ class User(UserMixin):
     @staticmethod
     def get(user_id):
         from app.database import get_db
-        db = get_db()
-        cursor = db.cursor()
-        cursor.execute('SELECT id, username, role, is_active FROM users WHERE id = ?', (user_id,))
-        user = cursor.fetchone()
-        if user:
-            return User(user[0], user[1], user[2], user[3])
+        try:
+            db = get_db()
+            cursor = db.cursor()
+            cursor.execute('SELECT id, username, role, is_active FROM users WHERE id = ?', (user_id,))
+            user = cursor.fetchone()
+            if user:
+                return User(user[0], user[1], user[2], user[3])
+        except Exception as e:
+            # Log error in production
+            print(f"Error loading user {user_id}: {e}")
         return None
     
     @staticmethod
