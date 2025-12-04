@@ -495,17 +495,65 @@ body.dark-mode .navbar-menu {
     background-color: var(--bg-primary) !important;
 }
 
-body.dark-mode .navbar-item {
-    color: var(--text-primary);
+body.dark-mode .navbar-item,
+body.dark-mode .navbar-item a,
+body.dark-mode .navbar-item span {
+    color: var(--text-primary) !important;
 }
 
-body.dark-mode .navbar-item:hover {
-    background-color: var(--bg-tertiary);
-    color: var(--text-primary);
+body.dark-mode .navbar-item:hover,
+body.dark-mode .navbar-item:hover a,
+body.dark-mode .navbar-item:hover span {
+    background-color: var(--bg-tertiary) !important;
+    color: var(--text-primary) !important;
 }
 
 body.dark-mode .navbar-item.is-active {
-    background-color: var(--bg-tertiary);
+    background-color: var(--bg-tertiary) !important;
+}
+
+body.dark-mode .navbar-item.is-active a,
+body.dark-mode .navbar-item.is-active span {
+    color: var(--text-primary) !important;
+}
+
+body.dark-mode .navbar-brand,
+body.dark-mode .navbar-brand a {
+    color: var(--text-primary) !important;
+}
+
+body.dark-mode .navbar-burger {
+    color: var(--text-primary) !important;
+}
+
+body.dark-mode .navbar-burger span {
+    background-color: var(--text-primary) !important;
+}
+
+body.dark-mode .navbar-item .icon,
+body.dark-mode .navbar-item .icon i {
+    color: var(--text-primary) !important;
+}
+
+body.dark-mode .navbar-item:hover .icon,
+body.dark-mode .navbar-item:hover .icon i {
+    color: var(--text-primary) !important;
+}
+
+/* Garantir que todos os elementos do navbar sejam visíveis */
+body.dark-mode .navbar-start .navbar-item,
+body.dark-mode .navbar-end .navbar-item {
+    color: var(--text-primary) !important;
+}
+
+body.dark-mode .navbar-start .navbar-item a,
+body.dark-mode .navbar-end .navbar-item a {
+    color: var(--text-primary) !important;
+}
+
+body.dark-mode .navbar-start .navbar-item span:not(.icon),
+body.dark-mode .navbar-end .navbar-item span:not(.icon) {
+    color: var(--text-primary) !important;
 }
 
 body.dark-mode .box {
