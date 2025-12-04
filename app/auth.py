@@ -49,7 +49,9 @@ class User(UserMixin):
         cursor.execute('SELECT * FROM users WHERE username = ?', (username,))
         user_data = cursor.fetchone()
         if user_data and check_password_hash(user_data['password'], password):
-            return User(user_data['id'], user_data['username'], user_data['role'], user_data['is_active'])
+            # Verificar se o usuário está ativo
+            user = User(user_data['id'], user_data['username'], user_data['role'], user_data['is_active'])
+            return user
         return None
     
     @staticmethod

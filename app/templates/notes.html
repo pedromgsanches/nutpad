@@ -235,6 +235,7 @@
                 
                 form.appendChild(titleField);
                 form.appendChild(contentField);
+                addCSRFToken(form);
                 document.body.appendChild(form);
                 form.submit();
             } else {
@@ -253,6 +254,7 @@
                 
                 form.appendChild(titleField);
                 form.appendChild(contentField);
+                addCSRFToken(form);
                 document.body.appendChild(form);
                 form.submit();
             }
@@ -265,6 +267,7 @@
                 form.method = 'post';
                 form.action = `/notes/${id}/delete`;
                 form.style.display = 'none';
+                addCSRFToken(form);
                 document.body.appendChild(form);
                 form.submit();
             }

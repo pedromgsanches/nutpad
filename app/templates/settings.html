@@ -47,6 +47,7 @@
             <!-- Minha Conta -->
             <div class="tab-pane is-active" id="account">
                 <form method="post" action="{{ url_for('settings') }}">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                     <div class="field">
                         <label class="label">Change Password</label>
                         <div class="field">
@@ -77,6 +78,7 @@
             {% if current_user.role == 'admin' %}
             <div class="tab-pane" id="users">
                 <form method="post" action="{{ url_for('new_user') }}" class="mb-4">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                     <div class="field">
                         <label class="label">Novo Usuário</label>
                         <div class="field-body">
@@ -140,6 +142,7 @@
                             <td>
                                 <div class="buttons are-small">
                                     <form method="post" action="{{ url_for('toggle_user_active', user_id=user[0]) }}" style="display: inline;">
+                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                                         <button type="submit" class="button {% if user[3] %}is-warning{% else %}is-success{% endif %}">
                                             <span class="icon">
                                                 <i class="fas {% if user[3] %}fa-ban{% else %}fa-check{% endif %}"></i>
@@ -154,6 +157,7 @@
                                     </button>
                                     
                                     <form method="post" action="{{ url_for('delete_user', user_id=user[0]) }}" style="display: inline;" onsubmit="return confirm('Tem certeza que deseja remover este usuário?');">
+                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                                         <button type="submit" class="button is-danger">
                                             <span class="icon">
                                                 <i class="fas fa-trash"></i>
@@ -181,6 +185,7 @@
         </header>
         <section class="modal-card-body">
             <form id="changePasswordForm" method="post">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                 <div class="field">
                     <label class="label">New Password</label>
                     <div class="control">
